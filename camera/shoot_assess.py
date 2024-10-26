@@ -21,6 +21,7 @@ def predict_image_class(model, img_path):
     predictions = model.predict(img_array)
     return predictions
 
+# to be updated when the new model is ready; just for example and testing
 def get_class_labels():
 
     return ['Alternaria Leaf Spot (Alternaria helianthi)',

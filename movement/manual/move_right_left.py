@@ -1,6 +1,16 @@
+# all of the methods here are deprecated
+# the movement function has been transfered to the ESP32-C3
+
 import RPi.GPIO as GPIO
 import time
 import sys
+import warnings
+
+def deprecated(func):
+    def wrapper(*args, **kwargs):
+        warnings.warn(f"{func.__name__} is deprecated.", DeprecationWarning)
+        return func(*args, **kwargs)
+    return wrapper
 
 if len(sys.argv) != 0:
     arg_speed = int(sys.argv[1])
@@ -28,6 +38,7 @@ for pin in right_servo_pins:
     pwm.start(0)
     right_pwm_objects.append(pwm)
 
+@deprecated
 # Function to set speed for a group of servos
 def set_speed(servos, speed):
     

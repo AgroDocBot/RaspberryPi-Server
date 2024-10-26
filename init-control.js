@@ -1,3 +1,7 @@
+// all of the methods here are deprecated
+// the control and movement functions have been transfered to the ESP32-C3
+// (see the ESP32-C3 Firmware repository)
+
 const express = require('express');
 const { exec } = require('child_process');
 const cors = require('cors');
@@ -12,6 +16,7 @@ const port = 3000;
 const servoForward = new Gpio(17, 'out');
 const servoBackward = new Gpio(18, 'out');
 
+console.warn("Movement control through the Raspberry Pi is deprecated.");
 
 app.get('/control/:direction', (req, res) => {
   const direction = req.params.direction;
