@@ -6,7 +6,7 @@ import subprocess
 subprocess.Popen(['fswebcam', 'testimg.jpg'] ,stdout=subprocess.PIPE)
 
 
-model = tf.keras.models.load_model('plant_disease_model.h5')
+model = tf.keras.models.load_model('model/plant_disease_model.h5')
 
 def preprocess_image(img_path, target_size=(150, 150)):
 

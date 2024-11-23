@@ -25,7 +25,6 @@ wss.on('connection', (ws, req) => {
                 console.log('Client connected via WebSocket.');
                 break;
             case 'shoot_assess':
-                // Take a photo using the shoot_assess.py script
                 exec('python3 camera/shoot_assess.py', (error, stdout, stderr) => {
                     if (error) {
                         console.error(`Error: ${error.message}`);
@@ -38,13 +37,13 @@ wss.on('connection', (ws, req) => {
                 });
                 break;
             case 'shoot_show':
-                // Read and send testimg.jpg as binary
+                // read and send testimg.jpg as binary
                 let imgPath = path.join(__dirname, 'testimg.jpg');
                 fs.readFile(imgPath, (err, data) => {
                     if (err) {
                         ws.send(JSON.stringify({ status: 'error', message: 'Error reading image' }));
                     } else {
-                        ws.send(data);  // Send binary image data
+                        ws.send(data);  // send binary image data
                     }
                 });
                 break;
@@ -63,6 +62,40 @@ wss.on('connection', (ws, req) => {
                     autoProcess.kill();
                     autoProcess = false;
                 }
+            case 'turn_right':
+                exec('python3 camera/movement/turning.py 1', (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`Error: ${error.message}`);
+                        ws.send(JSON.stringify({ status: 'error', message: error.message }));
+                    } else {
+                        let output = stderr + stdout;
+                        console.log(`Result: ${stdout}`);
+                        ws.send(JSON.stringify({ status: 'success', output: output }));
+                    }
+                })
+            case 'turn_left':
+                exec('python3 camera/movement/turning.py -1', (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`Error: ${error.message}`);
+                        ws.send(JSON.stringify({ status: 'error', message: error.message }));
+                    } else {
+                        let output = stderr + stdout;
+                        console.log(`Result: ${stdout}`);
+                        ws.send(JSON.stringify({ status: 'success', output: output }));
+                    }
+                })
+            case 'stop':
+                fs.writeFileSync('stop_signal.txt', '1');
+                exec('python3 camera/movement/turning.py 0', (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`Error: ${error.message}`);
+                        ws.send(JSON.stringify({ status: 'error', message: error.message }));
+                    } else {
+                        let output = stderr + stdout;
+                        console.log(`Result: ${stdout}`);
+                        ws.send(JSON.stringify({ status: 'success', output: output }));
+                    }
+                })
             default:
                 ws.send(JSON.stringify({ status: 'error', message: 'Invalid command' }));
         }
