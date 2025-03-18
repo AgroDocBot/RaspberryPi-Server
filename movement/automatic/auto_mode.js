@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const { execSync } = require('child_process');
 
-const ESP32_WS_URL = 'ws://192.168.4.18:81/ws';
+const ESP32_WS_URL = 'ws://192.168.4.16:81/ws';
 const ws = new WebSocket(ESP32_WS_URL);
 
 const measureDistance = () => {

@@ -51,6 +51,37 @@ wss.on('connection', (ws, req) => {
                     }
                 });
                 break;
+	    case 'shoot_assess_gps':
+		exec('python3 camera/shoot_assess.py', (error, stdout, stderr) => {
+                    if (error) {
+                        console.error(`Error: ${error.message}`);
+                        ws.send(JSON.stringify({ status: 'error', message: error.message }));
+                    } else {
+                        let output = stderr + stdout;
+                        console.log(`Result: ${stdout}`);
+			exec('gpspipe -w -n 10', (error, stdout, stderr) => {
+				    if (error) {
+				        console.error(`Error: ${error.message}`);
+				        ws.send(JSON.stringify({ status: 'error', message: error.message }));
+				    } else {
+
+					console.log(stdout);
+					let iLat = stdout.indexOf('lat')+5;
+					let iLon = stdout.indexOf('lon')+5;
+					let iAlt = stdout.indexOf('alt')+8;
+
+				            ws.send(JSON.stringify({
+				                status: 'success',
+						output: output,
+				                latitude: stdout.substr(iLat, 12),
+				                longitude: stdout.substr(iLon, 12),
+				            }));
+
+				    }
+				});
+                    }
+                });
+                break;
             case 'shoot_show':
                 // read and send testimg.jpg as binary
                 let imgPath = path.join(__dirname, 'testimg.jpg');
@@ -59,6 +90,7 @@ wss.on('connection', (ws, req) => {
                         ws.send(JSON.stringify({ status: 'error', message: 'Error reading image' }));
                     } else {
                         ws.send(data);  // send binary image data
+			console.log("Attempted to send: "+data);
                     }
                 });
                 break;
@@ -152,6 +184,27 @@ wss.on('connection', (ws, req) => {
                     }
                 })
 		break;
+	    case 'get_battery':
+		exec('python3 ./battery/INA219.py', (error, stdout, stderr) => {
+		   if(error) {
+                        console.error(`Error: ${error.message}`);
+                        ws.send(JSON.stringify({ status: 'error', message: error.message }));
+		   } else {
+			let output = stderr + stdout;
+			let batteryI = output.indexOf("%");
+			let powerI = output.indexOf(" W");
+			let voltageI = output.indexOf(" V");
+			
+			ws.send(JSON.stringify({
+			    battery: output.substr(batteryI - 4, batteryI),
+			    power: output.substr(powerI - 5, powerI),
+			    voltage: output.substr(voltageI - 6, voltageI),
+			}));
+			
+		   }
+
+	        })
+		break;
 	    case 'gps':
                 exec('gpspipe -w -n 10', (error, stdout, stderr) => {
                     if (error) {
@@ -179,3 +232,4 @@ wss.on('connection', (ws, req) => {
         }
     });
 });
+

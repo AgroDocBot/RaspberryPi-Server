@@ -5,8 +5,8 @@ import sys
 position_file = "last_pos.txt"
 stop_signal_file = "stop_signal.txt"
 
-servo_pin = 15
-step = 5  
+servo_pin = 17
+step = 5
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(servo_pin, GPIO.OUT)
@@ -28,7 +28,7 @@ def set_angle(angle):
     duty_cycle = 2 + (angle / 18)
     GPIO.output(servo_pin, True)
     pwm.ChangeDutyCycle(duty_cycle)
-    time.sleep(0.5)
+    time.sleep(0.15)
     GPIO.output(servo_pin, False)
     pwm.ChangeDutyCycle(0)
     write_angle_to_file(angle)
@@ -58,7 +58,6 @@ try:
             print(f"Moving to {current_angle}°")
             set_angle(current_angle)
             current_angle += step if arg_req == 1 else -step
-            time.sleep(1)
     elif arg_req == 2:  
         set_stop_signal(0)  
         set_angle(180)

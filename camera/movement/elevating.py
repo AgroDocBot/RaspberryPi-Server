@@ -1,9 +1,11 @@
 import RPi.GPIO as GPIO
 import time
+import sys
 
-arg_speed = int(sys.argv[1])
+arg_speed = float(sys.argv[1])
+arg_time = float(sys.argv[2])
 
-servo_pin = 15  
+servo_pin = 18  
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(servo_pin, GPIO.OUT)
 
@@ -13,7 +15,12 @@ pwm.start(0)
 try:
     
     pwm.ChangeDutyCycle(arg_speed)
-    time.sleep(1)
+    time.sleep(arg_time)
+    pwm.ChangeDutyCycle(7.5)
+    time.sleep(0.5)
+    pwm.ChangeDutyCycle(0)
+    time.sleep(0.5)
+
 
 except KeyboardInterrupt:
     pass
